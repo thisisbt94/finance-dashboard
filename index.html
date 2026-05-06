@@ -202,32 +202,46 @@
 
   <!-- AI ANALYST -->
   <div class="panel" id="panel-analyst">
+
+    <!-- Tonight's read -->
     <div class="b-box">
-      <div class="b-lbl">Tonight's read</div>
+      <div class="b-lbl">Tonight's signals</div>
       <div class="b-content" id="bContent">Loading…</div>
     </div>
 
+    <!-- New stock suggestions — self-contained -->
     <div class="b-box">
-      <div class="b-lbl">New stock suggestions — Danelfin top picks</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:0.75rem;line-height:1.6;">
-        Stocks scoring 9–10 on Danelfin tonight that you <strong style="color:var(--text);">don't already own</strong>.
+      <div class="b-lbl">New stock suggestions</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:1rem;line-height:1.6;">
+        Danelfin BUY signals (score ≥7) tonight that you <strong style="color:var(--text);">don't already own</strong>. Hit the button — cards load, then ILMU tells you which ones are worth buying.
       </div>
-      <button class="picks-btn" id="picksBtn" onclick="loadTopPicks()">↓ Load tonight's top picks</button>
-      <div id="picksResult" style="margin-top:0.75rem;"></div>
+      <button class="picks-btn" id="picksBtn" onclick="loadTopPicks()">↓ Find new stocks to buy tonight</button>
+
+      <!-- Pick cards render here -->
+      <div id="picksCards" style="margin-top:1rem;"></div>
+
+      <!-- ILMU analysis renders here, inside this same box -->
+      <div id="picksAnalysis" style="display:none;margin-top:1rem;">
+        <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.6rem;">ILMU's verdict</div>
+        <div id="picksAnalysisText" class="ai-resp visible" style="margin-top:0;"></div>
+      </div>
     </div>
 
+    <!-- Ask your analyst — separate, clean -->
     <div class="b-box">
       <div class="b-lbl">Ask your analyst</div>
-      <div style="margin-bottom:0.5rem;"><span class="ilmu-badge">ILMU Claw Nemo-Super · via n8n</span></div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:0.75rem;line-height:1.6;">
-        Your full portfolio context is included automatically with every question.
+      <div style="margin-bottom:0.6rem;"><span class="ilmu-badge">ILMU Claw Nemo-Super · via n8n</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:0.9rem;line-height:1.6;">
+        Ask anything — your full portfolio, Danelfin scores and prices are sent automatically.
+        <br>Examples: <em>"Should I sell INTC?"</em> · <em>"Which holding has the worst score?"</em> · <em>"Where should my RM500 go this month?"</em>
       </div>
       <div class="q-row">
-        <input type="text" class="q-input" id="qIn" placeholder="e.g. Should I buy more NVDA? What's the best pick tonight?" />
+        <input type="text" class="q-input" id="qIn" placeholder="Type your question and hit Enter…" />
         <button class="q-btn" id="qBtn" onclick="askILMU()">Ask ↗</button>
       </div>
       <div class="ai-resp" id="aiResp"></div>
     </div>
+
   </div>
 
 </main>
@@ -412,47 +426,129 @@ async function fetchDanelfin(){
 
 // ─── TOP PICKS via Danelfin proxy ─────────────────────────────────────────────
 async function loadTopPicks(){
-  const btn=document.getElementById('picksBtn'),result=document.getElementById('picksResult');
-  btn.disabled=true;btn.textContent='Loading…';
-  result.innerHTML='<div class="picks-empty"><span class="spinner"></span> Fetching Danelfin top-ranked stocks…</div>';
+  const btn=document.getElementById('picksBtn');
+  const cardsEl=document.getElementById('picksCards');
+  const analysisEl=document.getElementById('picksAnalysis');
+  const analysisText=document.getElementById('picksAnalysisText');
+
+  btn.disabled=true; btn.textContent='Loading…';
+  cardsEl.innerHTML='<div class="picks-empty"><span class="spinner"></span> Fetching Danelfin top-ranked stocks…</div>';
+  analysisEl.style.display='none';
+
   try{
     const today=new Date().toISOString().split('T')[0];
-    const [r9,r10]=await Promise.all([
-      fetch(N8N_DANELFIN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:today,aiscore:9})}),
-      fetch(N8N_DANELFIN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:today,aiscore:10})}),
-    ]);
-    const [d9,d10]=await Promise.all([r9.json(),r10.json()]);
-    const all=[...(Array.isArray(d10)?d10:[]),...(Array.isArray(d9)?d9:[])];
-    const newPicks=all.filter(item=>{const t=(item.ticker||item.symbol||'').toUpperCase();return t&&!OWNED.has(t);}).slice(0,8);
+    const r=await fetch(N8N_DANELFIN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:today,aiscore_min:7})});
+    if(!r.ok) throw new Error('Proxy returned '+r.status);
+    const raw=await r.json();
 
-    if(newPicks.length===0){result.innerHTML='<div class="picks-empty">No new high-score picks found outside your holdings tonight. Check back after US close.</div>';btn.disabled=false;btn.textContent='↓ Reload top picks';return;}
+    // Danelfin ranking returns array of {ticker, aiscore, technical, fundamental, sentiment}
+    // Normalise whatever shape comes back into an array
+    let all=[];
+    if(Array.isArray(raw)) all=raw;
+    else if(raw&&typeof raw==='object'){
+      // Could be { ticker: { aiscore, ... } } or { date: { ticker: { ... } } }
+      const vals=Object.values(raw);
+      if(vals.length>0&&typeof vals[0]==='object'&&!Array.isArray(vals[0])){
+        // Try one level deeper
+        const deeper=Object.values(vals[0]);
+        if(deeper.length>0&&typeof deeper[0]==='object') all=deeper;
+        else all=vals;
+      } else all=vals;
+    }
 
+    // Filter out stocks already owned, sort by score desc, take top 8
+    const newPicks=all
+      .filter(item=>{
+        const t=(item.ticker||item.symbol||'').toUpperCase();
+        return t && !OWNED.has(t) && (item.aiscore||item.ai_score);
+      })
+      .sort((a,b)=>(b.aiscore||b.ai_score||0)-(a.aiscore||a.ai_score||0))
+      .slice(0,8);
+
+    if(newPicks.length===0){
+      cardsEl.innerHTML='<div class="picks-empty" style="color:var(--muted);">No new BUY-signal stocks found outside your holdings tonight.<br>Danelfin scores update after US market close (~4am MYT).</div>';
+      btn.disabled=false; btn.textContent='↓ Try again';
+      return;
+    }
+
+    // Fetch live prices for each pick
     await Promise.allSettled(newPicks.map(async p=>{
       const t=(p.ticker||p.symbol||'').toUpperCase();
-      try{const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${t}&token=${FINNHUB_KEY}`);const d=await r.json();if(d.c>0){p._price=d.c;p._change=d.dp||0;}}catch(e){}
+      try{
+        const fr=await fetch(`https://finnhub.io/api/v1/quote?symbol=${t}&token=${FINNHUB_KEY}`);
+        const fd=await fr.json();
+        if(fd.c>0){p._price=fd.c; p._change=fd.dp||0;}
+      }catch(e){}
     }));
 
-    result.innerHTML='';
-    const grid=document.createElement('div');grid.className='picks-grid';
+    // Render pick cards
+    cardsEl.innerHTML='';
+    const grid=document.createElement('div'); grid.className='picks-grid';
     newPicks.forEach(p=>{
       const t=(p.ticker||p.symbol||'').toUpperCase();
       const score=p.aiscore??p.ai_score??'—';
-      const card=document.createElement('div');card.className='pick-card';
-      card.innerHTML=`<span class="pick-badge">New · Not owned</span><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;"><div class="pick-score">${score}</div><div style="font-size:10px;color:var(--muted);">/10</div></div><div class="pick-ticker">${t}</div><div style="font-family:'DM Mono',monospace;font-size:12px;margin-bottom:4px;">${p._price?fmt(p._price):'—'} <span class="${(p._change||0)>=0?'up':'down'}" style="font-size:10px;">${p._change!=null?fmtC(p._change):''}</span></div><div class="pick-reason">Tech ${p.technical??'—'} · Fund ${p.fundamental??'—'} · Sent ${p.sentiment??'—'}</div>`;
+      const col=sColor(typeof score==='number'?score:null);
+      const card=document.createElement('div'); card.className='pick-card';
+      card.innerHTML=`
+        <span class="pick-badge">Not owned · Score ${score}/10</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;">${t}</div>
+          <div style="font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:${col};">${score}</div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;margin-bottom:6px;color:var(--muted);">
+          ${p._price?fmt(p._price):'Price N/A'}
+          ${p._change!=null?`<span class="${p._change>=0?'up':'down'}" style="margin-left:6px;">${fmtC(p._change)}</span>`:''}
+        </div>
+        <div class="pick-reason">
+          Tech <strong style="color:var(--blue);">${p.technical??'—'}</strong> ·
+          Fund <strong style="color:var(--accent);">${p.fundamental??'—'}</strong> ·
+          Sent <strong style="color:var(--hold);">${p.sentiment??'—'}</strong>
+        </div>`;
       grid.appendChild(card);
     });
-    result.appendChild(grid);
+    cardsEl.appendChild(grid);
 
-    // Auto-ask ILMU about the picks
-    const pickSummary=newPicks.map(p=>`${(p.ticker||p.symbol||'').toUpperCase()}: AI Score ${p.aiscore??'—'}/10 (Tech:${p.technical??'—'} Fund:${p.fundamental??'—'} Sent:${p.sentiment??'—'})`).join('\n');
-    const resp=document.getElementById('aiResp');
-    resp.className='ai-resp visible';
-    resp.innerHTML='<span class="spinner"></span> ILMU is analysing tonight\'s top picks…';
-    await callILMU(`Tonight's Danelfin top picks (9-10/10) I don't own yet:\n${pickSummary}\n\nMy current holdings: ${STOCKS.map(s=>s.ticker).join(', ')}\n\nWhich 2-3 are most worth adding given my RM500/month budget and long-term passive income goal?`,resp);
+    // Show ILMU analysis section and start loading
+    analysisEl.style.display='block';
+    analysisText.innerHTML='<span class="spinner"></span> ILMU is analysing these picks against your portfolio…';
+
+    // Build a rich prompt — explicit buy/sell/trim reasoning per stock
+    const myHoldings=STOCKS.map(s=>{
+      const dd=dData[s.ticker]||{},pd=stkPx[s.ticker]||{};
+      const pnl=pd.price&&s.cost?((pd.price-s.cost)/s.cost*100).toFixed(1)+'%':'N/A';
+      return`${s.ticker}: Danelfin ${dd.aiscore??'pending'}/10, P&L ${pnl}, signal: ${s2sig(dd.aiscore??null)}`;
+    }).join('\n');
+
+    const picksSummary=newPicks.map(p=>{
+      const t=(p.ticker||p.symbol||'').toUpperCase();
+      return`${t}: AI Score ${p.aiscore??'—'}/10 (Tech:${p.technical??'—'} Fund:${p.fundamental??'—'} Sent:${p.sentiment??'—'}) Price:${p._price?fmt(p._price):'N/A'}`;
+    }).join('\n');
+
+    const prompt=`You are analysing Bradley's portfolio and new Danelfin stock suggestions.
+
+BRADLEY'S CURRENT HOLDINGS (with Danelfin scores):
+${myHoldings}
+
+NEW DANELFIN BUY SIGNALS TONIGHT (stocks he doesn't own):
+${picksSummary}
+
+His budget: RM500/month. Goal: long-term passive income, slightly aggressive.
+Danelfin scoring: 7-10 = BUY, 4-6 = HOLD, 1-3 = SELL/TRIM.
+
+Give Bradley:
+1. Which 2 new stocks from the list above are worth buying this month and why (reference the sub-scores)
+2. Which of his CURRENT holdings have low Danelfin scores he should consider trimming to free up capital
+3. One-line action for each recommendation: BUY / TRIM / HOLD
+
+Be direct. Format as short paragraphs. No disclaimers.`;
+
+    await callILMU(prompt, analysisText);
+
   }catch(e){
-    result.innerHTML=`<div class="picks-empty" style="color:var(--watch);">Error loading picks: ${e.message}</div>`;
+    cardsEl.innerHTML=`<div class="picks-empty" style="color:var(--watch);">Error: ${e.message}</div>`;
+    console.error('Top picks error:',e);
   }
-  btn.disabled=false;btn.textContent='↓ Reload top picks';
+  btn.disabled=false; btn.textContent='↓ Refresh picks';
 }
 
 // ─── ILMU via n8n proxy ───────────────────────────────────────────────────────
