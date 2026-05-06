@@ -437,7 +437,7 @@ async function loadTopPicks(){
 
   try{
     const today=new Date().toISOString().split('T')[0];
-    const r=await fetch(N8N_DANELFIN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:today,aiscore_min:7})});
+    const r=await fetch(N8N_DANELFIN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:today,aiscore_min:3})});
     if(!r.ok) throw new Error('Proxy returned '+r.status);
     const raw=await r.json();
 
