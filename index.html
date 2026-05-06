@@ -66,7 +66,6 @@
   .sig-pill.buy{background:var(--buy-dim);color:var(--buy);}
   .sig-pill.hold{background:var(--hold-dim);color:var(--hold);}
   .sig-pill.watch{background:var(--watch-dim);color:var(--watch);}
-  .sig-pill.new{background:rgba(126,184,247,0.12);color:var(--blue);}
 
   .card-price{display:flex;align-items:baseline;gap:8px;margin-bottom:0.6rem;}
   .price{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;}
@@ -98,7 +97,6 @@
   .action-box.buy{background:var(--buy-dim);border-color:rgba(200,242,90,0.2);}
   .action-box.hold{background:var(--hold-dim);border-color:rgba(240,192,64,0.2);}
   .action-box.watch{background:var(--watch-dim);border-color:rgba(255,107,107,0.2);}
-  .action-box.new{background:rgba(126,184,247,0.07);border-color:rgba(126,184,247,0.2);}
   .action-icon{font-size:18px;flex-shrink:0;}
   .action-txt{font-size:12px;line-height:1.6;}
   .action-txt strong{font-weight:500;display:block;margin-bottom:2px;font-size:13px;}
@@ -114,7 +112,6 @@
   .a-amt{font-family:'DM Mono',monospace;font-size:12px;width:58px;text-align:right;flex-shrink:0;}
   .a-sig{font-size:9px;width:36px;text-align:right;text-transform:uppercase;flex-shrink:0;}
 
-  /* BRIEFING / ANALYST */
   .b-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1.25rem;}
   .b-lbl{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;}
   .b-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -123,7 +120,6 @@
   .b-content .buy-hl{color:var(--buy);}
   .b-content .watch-hl{color:var(--watch);}
 
-  /* TOP PICKS */
   .picks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:0.75rem;}
   .pick-card{background:var(--surface);padding:1rem;position:relative;}
   .pick-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue);}
@@ -131,10 +127,8 @@
   .pick-ticker{font-family:'DM Mono',monospace;font-size:14px;margin-bottom:2px;}
   .pick-reason{font-size:10px;color:var(--muted);line-height:1.5;margin-top:6px;}
   .pick-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(126,184,247,0.12);color:var(--blue);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
-
   .picks-empty{font-size:12px;color:var(--muted);padding:1rem;text-align:center;}
 
-  /* ANALYST BOX */
   .q-row{display:flex;gap:8px;margin-top:0.9rem;}
   .q-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:0.65rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;}
   .q-input:focus{border-color:var(--accent);}
@@ -147,7 +141,7 @@
   .picks-btn:disabled{opacity:0.4;cursor:not-allowed;}
   .ai-resp{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin-top:1rem;font-size:13px;line-height:1.8;color:#c0c0cf;display:none;}
   .ai-resp.visible{display:block;}
-  .ilmu-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(200,242,90,0.1);color:var(--accent);letter-spacing:0.06em;margin-bottom:8px;text-transform:uppercase;}
+  .ilmu-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;background:rgba(200,242,90,0.1);color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;}
 
   .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(200,242,90,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:-2px;margin-right:6px;}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -171,7 +165,7 @@
   <div class="s-item"><div class="s-dot" id="dStocks"></div><span id="tStocks">Stocks: loading…</span></div>
   <div class="s-item"><div class="s-dot" id="dCrypto"></div><span id="tCrypto">Crypto: loading…</span></div>
   <div class="s-item"><div class="s-dot" id="dDan"></div><span id="tDan">Danelfin: loading…</span></div>
-  <div class="s-item"><div class="s-dot live" id="dIlmu"></div><span id="tIlmu" style="color:var(--accent);">ILMU Claw Nemo-Super: ready</span></div>
+  <div class="s-item"><div class="s-dot live"></div><span style="color:var(--accent);">ILMU: ready via n8n</span></div>
   <span id="lastUp"></span>
   <button class="ref-btn" onclick="refreshAll()">↻ Refresh all</button>
 </div>
@@ -186,7 +180,7 @@
 
   <!-- SIGNALS -->
   <div class="panel active" id="panel-signals">
-    <div class="sec-lbl" style="font-size:9px;opacity:0.5;margin-bottom:0.4rem;">STOCKS & ETFS — Finnhub live · Danelfin AI score</div>
+    <div class="sec-lbl" style="font-size:9px;opacity:0.5;margin-bottom:0.4rem;">STOCKS & ETFS — Finnhub live · Danelfin AI score via n8n</div>
     <div class="sig-grid" id="stockGrid"></div>
     <div class="sec-lbl" style="font-size:9px;opacity:0.5;margin-top:1.5rem;margin-bottom:0.4rem;">CRYPTO — CoinGecko live · momentum signal</div>
     <div class="sig-grid" id="cryptoGrid"></div>
@@ -208,31 +202,25 @@
 
   <!-- AI ANALYST -->
   <div class="panel" id="panel-analyst">
-
-    <!-- Tonight's read -->
     <div class="b-box">
       <div class="b-lbl">Tonight's read</div>
       <div class="b-content" id="bContent">Loading…</div>
     </div>
 
-    <!-- Top Picks from Danelfin -->
     <div class="b-box">
       <div class="b-lbl">New stock suggestions — Danelfin top picks</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:0.75rem;line-height:1.6;">
-        Stocks scoring 9–10 on Danelfin tonight that you <strong style="color:var(--text);">don't already own</strong>. These are potential additions to your portfolio.
+        Stocks scoring 9–10 on Danelfin tonight that you <strong style="color:var(--text);">don't already own</strong>.
       </div>
       <button class="picks-btn" id="picksBtn" onclick="loadTopPicks()">↓ Load tonight's top picks</button>
       <div id="picksResult" style="margin-top:0.75rem;"></div>
     </div>
 
-    <!-- ILMU Analyst -->
     <div class="b-box">
       <div class="b-lbl">Ask your analyst</div>
-      <div style="margin-bottom:0.5rem;">
-        <span class="ilmu-badge">Powered by ILMU Claw Nemo-Super</span>
-      </div>
+      <div style="margin-bottom:0.5rem;"><span class="ilmu-badge">ILMU Claw Nemo-Super · via n8n</span></div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:0.75rem;line-height:1.6;">
-        Ask anything about your portfolio, new stocks to consider, or tonight's signals. Full portfolio context is sent automatically.
+        Your full portfolio context is included automatically with every question.
       </div>
       <div class="q-row">
         <input type="text" class="q-input" id="qIn" placeholder="e.g. Should I buy more NVDA? What's the best pick tonight?" />
@@ -240,8 +228,8 @@
       </div>
       <div class="ai-resp" id="aiResp"></div>
     </div>
-
   </div>
+
 </main>
 
 <footer>
@@ -250,12 +238,13 @@
 </footer>
 
 <script>
-// ─── API KEYS ─────────────────────────────────────────────────────────────────
+// ─── PROXY ENDPOINTS (n8n webhooks — no CORS issues) ─────────────────────────
+const N8N_DANELFIN = 'https://bradley-work.app.n8n.cloud/webhook/danelfin-proxy';
+const N8N_ILMU     = 'https://bradley-work.app.n8n.cloud/webhook/ilmu-proxy';
+
+// ─── DIRECT API KEYS (browser-safe APIs) ─────────────────────────────────────
 const FINNHUB_KEY  = 'd7a9ms9r01qn9i7k5fjgd7a9ms9r01qn9i7k5fk0';
-const DANELFIN_KEY = 'P2EuYEzr4w3u83XAX9UdlasSdEZWXGmU3Ugbg8tG';
-const ILMU_KEY     = 'sk-2b78fd78f0c69623e22b52b8935dbef384451293dae4cf29';
-const ILMU_URL     = 'https://api.ilmu.ai/v1/chat/completions';
-const ILMU_MODEL   = 'nemo-super';
+const DANELFIN_KEY = 'P2EuYEzr4w3u83XAX9UdlasSdEZWXGmU3Ugbg8tG'; // used by n8n, kept for top-picks fallback
 
 // ─── HOLDINGS ────────────────────────────────────────────────────────────────
 const STOCKS = [
@@ -274,20 +263,19 @@ const STOCKS = [
   {ticker:'VUG',  name:'Growth ETF',   cost:80.55,  qty:0.4962},
 ];
 const CRYPTO = [
-  {ticker:'BTC',  name:'Bitcoin',       id:'bitcoin'           },
-  {ticker:'ETH',  name:'Ethereum',      id:'ethereum'          },
-  {ticker:'SOL',  name:'Solana',        id:'solana'            },
-  {ticker:'XRP',  name:'XRP',           id:'ripple'            },
-  {ticker:'TON',  name:'Toncoin',       id:'the-open-network'  },
-  {ticker:'ONDO', name:'Ondo Finance',  id:'ondo-finance'      },
-  {ticker:'ADA',  name:'Cardano',       id:'cardano'           },
-  {ticker:'HBAR', name:'Hedera',        id:'hedera-hashgraph'  },
-  {ticker:'MATIC',name:'Polygon',       id:'matic-network'     },
-  {ticker:'XLM',  name:'Stellar',       id:'stellar'           },
-  {ticker:'ZEC',  name:'Zcash',         id:'zcash'             },
+  {ticker:'BTC',  name:'Bitcoin',      id:'bitcoin'          },
+  {ticker:'ETH',  name:'Ethereum',     id:'ethereum'         },
+  {ticker:'SOL',  name:'Solana',       id:'solana'           },
+  {ticker:'XRP',  name:'XRP',          id:'ripple'           },
+  {ticker:'TON',  name:'Toncoin',      id:'the-open-network' },
+  {ticker:'ONDO', name:'Ondo Finance', id:'ondo-finance'     },
+  {ticker:'ADA',  name:'Cardano',      id:'cardano'          },
+  {ticker:'HBAR', name:'Hedera',       id:'hedera-hashgraph' },
+  {ticker:'MATIC',name:'Polygon',      id:'matic-network'    },
+  {ticker:'XLM',  name:'Stellar',      id:'stellar'          },
+  {ticker:'ZEC',  name:'Zcash',        id:'zcash'            },
 ];
-
-const OWNED_TICKERS = new Set(STOCKS.map(s => s.ticker));
+const OWNED = new Set(STOCKS.map(s => s.ticker));
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let stkPx={}, cryPx={}, dData={}, selCard=null;
@@ -299,25 +287,10 @@ const fmt = n => n >= 1000
 const fmtC = n => (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
 const sigColor = {buy:'var(--buy)',hold:'var(--hold)',watch:'var(--watch)'};
 
-function s2sig(score){
-  if(score==null)return'hold';
-  if(score>=7)return'buy';
-  if(score<=3)return'watch';
-  return'hold';
-}
-function sColor(score){
-  if(score==null)return'var(--muted)';
-  if(score>=7)return'var(--buy)';
-  if(score<=3)return'var(--watch)';
-  return'var(--hold)';
-}
-function cSig(c24,c7){
-  if(c24>5&&c7>10)return'buy';
-  if(c24<-5)return'watch';
-  return'hold';
-}
+function s2sig(s){ if(s==null)return'hold'; if(s>=7)return'buy'; if(s<=3)return'watch'; return'hold'; }
+function sColor(s){ if(s==null)return'var(--muted)'; if(s>=7)return'var(--buy)'; if(s<=3)return'var(--watch)'; return'var(--hold)'; }
+function cSig(c24,c7){ if(c24>5&&c7>10)return'buy'; if(c24<-5)return'watch'; return'hold'; }
 
-// ─── RING ─────────────────────────────────────────────────────────────────────
 function ring(score){
   const col=sColor(score),r=14,ci=2*Math.PI*r,d=score?(score/10)*ci:0;
   return`<div class="ring-wrap"><svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/><circle cx="18" cy="18" r="${r}" fill="none" stroke="${col}" stroke-width="3" stroke-dasharray="${d.toFixed(1)} ${ci.toFixed(1)}" stroke-linecap="round"/></svg><div class="ring-num" style="color:${col}">${score??'—'}</div></div>`;
@@ -326,7 +299,7 @@ function ssBar(lbl,val,col){
   return`<div class="ssrow"><span class="sslbl">${lbl}</span><div class="ssbar"><div class="ssfill" style="width:${val?(val/10)*100:0}%;background:${col};opacity:0.75;"></div></div><span class="ssval">${val??'—'}</span></div>`;
 }
 
-// ─── RENDER STOCKS ────────────────────────────────────────────────────────────
+// ─── RENDER ───────────────────────────────────────────────────────────────────
 function renderStocks(){
   const g=document.getElementById('stockGrid');g.innerHTML='';
   STOCKS.forEach(s=>{
@@ -335,7 +308,7 @@ function renderStocks(){
     const sig=s2sig(score);
     const pnl=price&&s.cost?((price-s.cost)/s.cost*100):null;
     const reason=score!=null
-      ?{buy:`AI Score ${score}/10 — high outperformance probability (3mo).`,hold:`AI Score ${score}/10 — neutral. Hold current position.`,watch:`AI Score ${score}/10 — low outperformance probability. Avoid adding.`}[sig]
+      ?{buy:`AI Score ${score}/10 — high outperformance probability (3mo).`,hold:`AI Score ${score}/10 — neutral. Hold.`,watch:`AI Score ${score}/10 — low outperformance probability. Avoid adding.`}[sig]
       :(pnl!=null?`${pnl>=0?'+':''}${pnl.toFixed(1)}% from cost. Danelfin score pending.`:'Loading…');
     const c=document.createElement('div');
     c.className=`sig-card ${sig}`;
@@ -349,47 +322,39 @@ function renderStocks(){
   });
 }
 
-// ─── RENDER CRYPTO ────────────────────────────────────────────────────────────
 function renderCrypto(){
   const g=document.getElementById('cryptoGrid');g.innerHTML='';
   CRYPTO.forEach(c=>{
     const pd=cryPx[c.id]||{};
-    const price=pd.price,c24=pd.change24h||0,c7=pd.change7d||0;
-    const sig=cSig(c24,c7);
-    const reason=sig==='buy'?`Strong momentum: +${c24.toFixed(1)}% today, +${c7.toFixed(1)}% this week.`:sig==='watch'?`Down ${Math.abs(c24).toFixed(1)}% today. Wait for floor.`:`Stable. ${c24>=0?'+':''}${c24.toFixed(1)}% today — hold.`;
+    const price=pd.price,c24=pd.change24h||0,c7=pd.change7d||0,sig=cSig(c24,c7);
+    const reason=sig==='buy'?`Strong momentum: +${c24.toFixed(1)}% today, +${c7.toFixed(1)}% this week.`:sig==='watch'?`Down ${Math.abs(c24).toFixed(1)}% today. Wait for floor.`:`Stable. ${c24>=0?'+':''}${c24.toFixed(1)}% today.`;
     const el=document.createElement('div');
     el.className=`sig-card ${sig}`;
     el.onclick=()=>showDetail({...c,price,chg:c24,c7,sig,type:'crypto'},el);
     el.innerHTML=`
       <div class="card-top"><div class="tkr-blk"><span class="tkr">${c.ticker}</span><span class="tkr-name">${c.name}</span></div><span class="sig-pill ${sig}">${sig.toUpperCase()}</span></div>
       <div class="card-price"><span class="price">${price?fmt(price):'—'}</span><span class="chg ${c24>=0?'up':'down'}">${fmtC(c24)}</span></div>
-      <div class="score-row" style="gap:8px;align-items:center;"><span style="font-size:11px;color:var(--muted);">7d: <span class="${c7>=0?'up':'down'}">${fmtC(c7)}</span></span><span style="font-size:10px;color:var(--muted);">Momentum signal only</span></div>
+      <div class="score-row" style="gap:8px;align-items:center;"><span style="font-size:11px;color:var(--muted);">7d: <span class="${c7>=0?'up':'down'}">${fmtC(c7)}</span></span><span style="font-size:10px;color:var(--muted);">Momentum only</span></div>
       <div class="card-reason">${reason}</div>`;
     g.appendChild(el);
   });
 }
 
-// ─── DETAIL ───────────────────────────────────────────────────────────────────
 function showDetail(asset,cardEl){
   document.querySelectorAll('.sig-card.selected').forEach(c=>c.classList.remove('selected'));
   if(selCard===cardEl){selCard=null;document.getElementById('detailPanel').classList.remove('visible');return;}
   selCard=cardEl;cardEl.classList.add('selected');
   const{sig,price,chg,type,score,dd,pnl,cost,c7}=asset;
   const col=sColor(score);
-  const msgs={
-    buy:`<strong>Action: Add position</strong>${score!=null?`Danelfin ${score}/10 — strong signal. Allocate part of your RM500 here.`:'Strong momentum. Good entry.'}`,
-    hold:`<strong>Action: Hold</strong>Neutral. Keep current position.`,
-    watch:`<strong>Action: Do not add</strong>${score!=null?`Danelfin ${score}/10 — avoid adding.`:'Negative momentum. Wait.'}`,
-  };
+  const msgs={buy:`<strong>Action: Add position</strong>${score!=null?`Danelfin ${score}/10 — strong signal. Allocate part of your RM500 here.`:'Strong momentum.'}`,hold:`<strong>Action: Hold</strong>Neutral signal. Keep current position.`,watch:`<strong>Action: Do not add</strong>${score!=null?`Danelfin ${score}/10 — below threshold.`:'Negative momentum.'}`};
   const dp=document.getElementById('detailPanel');
   dp.innerHTML=`
     <div class="d-hdr"><div><div class="d-tkr">${asset.ticker}</div><div class="d-nm">${asset.name||''} · ${type==='stock'?'Stock/ETF':'Crypto'}</div></div><span class="sig-pill ${sig}" style="font-size:11px;padding:4px 14px;">${sig.toUpperCase()}</span></div>
     <div class="stat-grid">
       <div class="stat-cell"><div class="stat-lbl">Price</div><div class="stat-val">${price?fmt(price):'—'}</div></div>
       <div class="stat-cell"><div class="stat-lbl">24h</div><div class="stat-val ${chg>=0?'up':'down'}">${fmtC(chg)}</div></div>
-      ${type==='stock'
-        ?`<div class="stat-cell"><div class="stat-lbl">Cost basis</div><div class="stat-val">${fmt(cost)}</div></div><div class="stat-cell"><div class="stat-lbl">P&L</div><div class="stat-val ${pnl>=0?'up':'down'}">${pnl!=null?pnl.toFixed(1)+'%':'—'}</div></div>`
-        :`<div class="stat-cell"><div class="stat-lbl">7d</div><div class="stat-val ${(c7||0)>=0?'up':'down'}">${fmtC(c7||0)}</div></div><div class="stat-cell"><div class="stat-lbl">AI Score</div><div class="stat-val" style="color:var(--muted)">N/A</div></div>`}
+      ${type==='stock'?`<div class="stat-cell"><div class="stat-lbl">Cost basis</div><div class="stat-val">${fmt(cost)}</div></div><div class="stat-cell"><div class="stat-lbl">P&L</div><div class="stat-val ${pnl>=0?'up':'down'}">${pnl!=null?pnl.toFixed(1)+'%':'—'}</div></div>`:
+      `<div class="stat-cell"><div class="stat-lbl">7d</div><div class="stat-val ${(c7||0)>=0?'up':'down'}">${fmtC(c7||0)}</div></div><div class="stat-cell"><div class="stat-lbl">AI Score</div><div class="stat-val" style="color:var(--muted)">N/A</div></div>`}
     </div>
     ${type==='stock'&&score!=null?`<div class="stat-grid" style="margin-bottom:1.25rem;"><div class="stat-cell"><div class="stat-lbl">AI Score</div><div class="stat-val" style="color:${col}">${score}/10</div></div><div class="stat-cell"><div class="stat-lbl">Technical</div><div class="stat-val" style="color:var(--blue)">${dd.technical??'—'}/10</div></div><div class="stat-cell"><div class="stat-lbl">Fundamental</div><div class="stat-val" style="color:var(--accent)">${dd.fundamental??'—'}/10</div></div><div class="stat-cell"><div class="stat-lbl">Sentiment</div><div class="stat-val" style="color:var(--hold)">${dd.sentiment??'—'}/10</div></div></div>`:''}
     <div class="action-box ${sig}"><div class="action-icon">${sig==='buy'?'▲':sig==='hold'?'◆':'▽'}</div><div class="action-txt">${msgs[sig]}</div></div>`;
@@ -397,40 +362,20 @@ function showDetail(asset,cardEl){
   dp.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-// ─── ALLOCATION ───────────────────────────────────────────────────────────────
 function renderAlloc(){
   const items=[];
-  STOCKS.forEach(s=>{
-    const dd=dData[s.ticker]||{},score=dd.aiscore??null,sig=s2sig(score);
-    const w=score!=null?score:(sig==='buy'?4:sig==='hold'?2:0);
-    if(w>0)items.push({ticker:s.ticker,score,sig,w,crypto:false});
-  });
-  CRYPTO.forEach(c=>{
-    const pd=cryPx[c.id]||{},sig=cSig(pd.change24h||0,pd.change7d||0);
-    const w=sig==='buy'?3:sig==='hold'?1:0;
-    if(w>0)items.push({ticker:c.ticker,score:null,sig,w,crypto:true});
-  });
+  STOCKS.forEach(s=>{const dd=dData[s.ticker]||{},score=dd.aiscore??null,sig=s2sig(score),w=score!=null?score:(sig==='buy'?4:sig==='hold'?2:0);if(w>0)items.push({ticker:s.ticker,score,sig,w,crypto:false});});
+  CRYPTO.forEach(c=>{const pd=cryPx[c.id]||{},sig=cSig(pd.change24h||0,pd.change7d||0),w=sig==='buy'?3:sig==='hold'?1:0;if(w>0)items.push({ticker:c.ticker,score:null,sig,w,crypto:true});});
   const tot=items.reduce((a,b)=>a+b.w,0)||1;
   const sorted=items.map(i=>({...i,amt:Math.round((i.w/tot)*500)})).sort((a,b)=>b.amt-a.amt).slice(0,12);
   const max=sorted[0]?.amt||1;
   const list=document.getElementById('allocList');list.innerHTML='';
-  sorted.forEach(i=>{
-    const r=document.createElement('div');r.className='alloc-row';
-    r.innerHTML=`<div class="a-tkr">${i.ticker}${i.crypto?'<span style="font-size:9px;color:var(--muted);margin-left:3px;">₿</span>':''}</div><div class="a-score" style="color:${i.score?sColor(i.score):'var(--muted)'}">${i.score??'~'}</div><div class="a-bar-wrap"><div class="a-bar" style="width:${Math.round((i.amt/max)*100)}%;background:${sigColor[i.sig]};"></div></div><div class="a-amt">RM ${i.amt}</div><div class="a-sig" style="color:${sigColor[i.sig]}">${i.sig}</div>`;
-    list.appendChild(r);
-  });
+  sorted.forEach(i=>{const r=document.createElement('div');r.className='alloc-row';r.innerHTML=`<div class="a-tkr">${i.ticker}${i.crypto?'<span style="font-size:9px;color:var(--muted);margin-left:3px;">₿</span>':''}</div><div class="a-score" style="color:${i.score?sColor(i.score):'var(--muted)'}">${i.score??'~'}</div><div class="a-bar-wrap"><div class="a-bar" style="width:${Math.round((i.amt/max)*100)}%;background:${sigColor[i.sig]};"></div></div><div class="a-amt">RM ${i.amt}</div><div class="a-sig" style="color:${sigColor[i.sig]}">${i.sig}</div>`;list.appendChild(r);});
 }
 
-// ─── BRIEFING ─────────────────────────────────────────────────────────────────
 function renderBriefing(){
   const buys=[],watches=[],noScore=[];
-  STOCKS.forEach(s=>{
-    const dd=dData[s.ticker]||{};
-    if(dd.aiscore==null){noScore.push(s.ticker);return;}
-    const sig=s2sig(dd.aiscore);
-    if(sig==='buy')buys.push(`${s.ticker} (${dd.aiscore}/10)`);
-    if(sig==='watch')watches.push(`${s.ticker} (${dd.aiscore}/10)`);
-  });
+  STOCKS.forEach(s=>{const dd=dData[s.ticker]||{};if(dd.aiscore==null){noScore.push(s.ticker);return;}const sig=s2sig(dd.aiscore);if(sig==='buy')buys.push(`${s.ticker} (${dd.aiscore}/10)`);if(sig==='watch')watches.push(`${s.ticker} (${dd.aiscore}/10)`);});
   const cBuys=CRYPTO.filter(c=>{const pd=cryPx[c.id]||{};return cSig(pd.change24h||0,pd.change7d||0)==='buy';}).map(c=>c.ticker);
   document.getElementById('bContent').innerHTML=`
     <span class="buy-hl">Stock BUY signals</span>: <span class="hl">${buys.join(', ')||'None tonight'}</span><br>
@@ -440,43 +385,51 @@ function renderBriefing(){
     <br><br>See <strong>RM500 Plan</strong> tab for your exact monthly split.`;
 }
 
-// ─── TOP PICKS (Danelfin stocks you don't own) ─────────────────────────────────
-async function loadTopPicks(){
-  const btn=document.getElementById('picksBtn');
-  const result=document.getElementById('picksResult');
-  btn.disabled=true;btn.textContent='Loading top picks…';
-  result.innerHTML='<div class="picks-empty"><span class="spinner"></span> Fetching Danelfin top-ranked stocks…</div>';
+// ─── DANELFIN via n8n proxy ────────────────────────────────────────────────────
+async function fetchDanelfin(){
+  setS('dan','warn','Danelfin: fetching via n8n…');
+  const today=new Date().toISOString().split('T')[0];
+  let ok=0;
+  await Promise.allSettled(STOCKS.map(async s=>{
+    try{
+      const r=await fetch(N8N_DANELFIN,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ticker:s.ticker,date:today})
+      });
+      if(!r.ok)throw new Error(r.status);
+      const data=await r.json();
+      const row=Array.isArray(data)?data[0]:data;
+      if(row&&(row.aiscore||row.ai_score)){
+        dData[s.ticker]={aiscore:row.aiscore??row.ai_score??null,technical:row.technical??null,fundamental:row.fundamental??null,sentiment:row.sentiment??null};
+        ok++;
+      }
+    }catch(e){console.warn('Danelfin proxy:',s.ticker,e.message);}
+  }));
+  if(ok>0)setS('dan','live',`Danelfin: ${ok}/${STOCKS.length} scores loaded`);
+  else setS('dan','warn','Danelfin: pending (scores update after US close)');
+}
 
+// ─── TOP PICKS via Danelfin proxy ─────────────────────────────────────────────
+async function loadTopPicks(){
+  const btn=document.getElementById('picksBtn'),result=document.getElementById('picksResult');
+  btn.disabled=true;btn.textContent='Loading…';
+  result.innerHTML='<div class="picks-empty"><span class="spinner"></span> Fetching Danelfin top-ranked stocks…</div>';
   try{
     const today=new Date().toISOString().split('T')[0];
-    // Fetch stocks scoring 9 and 10 today
     const [r9,r10]=await Promise.all([
-      fetch(`https://apirest.danelfin.com/ranking?date=${today}&aiscore=9`,{headers:{'x-api-key':DANELFIN_KEY}}),
-      fetch(`https://apirest.danelfin.com/ranking?date=${today}&aiscore=10`,{headers:{'x-api-key':DANELFIN_KEY}}),
+      fetch(N8N_DANELFIN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:today,aiscore:9})}),
+      fetch(N8N_DANELFIN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({date:today,aiscore:10})}),
     ]);
     const [d9,d10]=await Promise.all([r9.json(),r10.json()]);
     const all=[...(Array.isArray(d10)?d10:[]),...(Array.isArray(d9)?d9:[])];
+    const newPicks=all.filter(item=>{const t=(item.ticker||item.symbol||'').toUpperCase();return t&&!OWNED.has(t);}).slice(0,8);
 
-    // Filter out stocks already owned
-    const newPicks=all.filter(item=>{
-      const t=(item.ticker||item.symbol||'').toUpperCase();
-      return t && !OWNED_TICKERS.has(t);
-    }).slice(0,8);
+    if(newPicks.length===0){result.innerHTML='<div class="picks-empty">No new high-score picks found outside your holdings tonight. Check back after US close.</div>';btn.disabled=false;btn.textContent='↓ Reload top picks';return;}
 
-    if(newPicks.length===0){
-      result.innerHTML='<div class="picks-empty" style="color:var(--muted);">No new high-score picks found tonight outside your current holdings. Check back after US market close.</div>';
-      btn.disabled=false;btn.textContent='↓ Reload top picks';
-      return;
-    }
-
-    // Fetch prices for picked tickers via Finnhub
     await Promise.allSettled(newPicks.map(async p=>{
       const t=(p.ticker||p.symbol||'').toUpperCase();
-      try{
-        const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${t}&token=${FINNHUB_KEY}`);
-        const d=await r.json();
-        if(d.c>0)p._price=d.c;p._change=d.dp||0;
-      }catch(e){}
+      try{const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${t}&token=${FINNHUB_KEY}`);const d=await r.json();if(d.c>0){p._price=d.c;p._change=d.dp||0;}}catch(e){}
     }));
 
     result.innerHTML='';
@@ -484,93 +437,48 @@ async function loadTopPicks(){
     newPicks.forEach(p=>{
       const t=(p.ticker||p.symbol||'').toUpperCase();
       const score=p.aiscore??p.ai_score??'—';
-      const tech=p.technical??'—',fund=p.fundamental??'—',sent=p.sentiment??'—';
-      const priceStr=p._price?fmt(p._price):'—';
-      const chgStr=p._change!=null?fmtC(p._change):'';
       const card=document.createElement('div');card.className='pick-card';
-      card.innerHTML=`
-        <span class="pick-badge">New · Not owned</span>
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
-          <div class="pick-score">${score}</div>
-          <div style="font-size:10px;color:var(--muted);">/10</div>
-        </div>
-        <div class="pick-ticker">${t}</div>
-        <div style="font-family:'DM Mono',monospace;font-size:12px;margin-bottom:4px;">${priceStr} <span class="${p._change>=0?'up':'down'}" style="font-size:10px;">${chgStr}</span></div>
-        <div class="pick-reason">Tech ${tech} · Fund ${fund} · Sent ${sent}</div>`;
+      card.innerHTML=`<span class="pick-badge">New · Not owned</span><div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;"><div class="pick-score">${score}</div><div style="font-size:10px;color:var(--muted);">/10</div></div><div class="pick-ticker">${t}</div><div style="font-family:'DM Mono',monospace;font-size:12px;margin-bottom:4px;">${p._price?fmt(p._price):'—'} <span class="${(p._change||0)>=0?'up':'down'}" style="font-size:10px;">${p._change!=null?fmtC(p._change):''}</span></div><div class="pick-reason">Tech ${p.technical??'—'} · Fund ${p.fundamental??'—'} · Sent ${p.sentiment??'—'}</div>`;
       grid.appendChild(card);
     });
     result.appendChild(grid);
 
-    // Auto-ask ILMU to summarise these picks
-    askILMUAboutPicks(newPicks);
-
+    // Auto-ask ILMU about the picks
+    const pickSummary=newPicks.map(p=>`${(p.ticker||p.symbol||'').toUpperCase()}: AI Score ${p.aiscore??'—'}/10 (Tech:${p.technical??'—'} Fund:${p.fundamental??'—'} Sent:${p.sentiment??'—'})`).join('\n');
+    const resp=document.getElementById('aiResp');
+    resp.className='ai-resp visible';
+    resp.innerHTML='<span class="spinner"></span> ILMU is analysing tonight\'s top picks…';
+    await callILMU(`Tonight's Danelfin top picks (9-10/10) I don't own yet:\n${pickSummary}\n\nMy current holdings: ${STOCKS.map(s=>s.ticker).join(', ')}\n\nWhich 2-3 are most worth adding given my RM500/month budget and long-term passive income goal?`,resp);
   }catch(e){
-    console.error('Top picks error:',e);
-    result.innerHTML='<div class="picks-empty" style="color:var(--watch);">Could not load picks — Danelfin may be rate-limiting. Try again after US market close.</div>';
+    result.innerHTML=`<div class="picks-empty" style="color:var(--watch);">Error loading picks: ${e.message}</div>`;
   }
   btn.disabled=false;btn.textContent='↓ Reload top picks';
 }
 
-async function askILMUAboutPicks(picks){
-  const resp=document.getElementById('aiResp');
-  resp.className='ai-resp visible';
-  resp.innerHTML='<span class="spinner"></span> ILMU is analysing tonight\'s top picks…';
-
-  const pickSummary=picks.map(p=>{
-    const t=(p.ticker||p.symbol||'').toUpperCase();
-    return`${t}: AI Score ${p.aiscore??'—'}/10 (Tech:${p.technical??'—'} Fund:${p.fundamental??'—'} Sent:${p.sentiment??'—'})`;
-  }).join('\n');
-
-  const myHoldings=STOCKS.map(s=>s.ticker).join(', ');
-
-  const prompt=`Tonight's Danelfin top-scoring stocks (9–10/10) that Bradley doesn't own yet:\n${pickSummary}\n\nHis current holdings: ${myHoldings}\n\nHe invests RM500/month, long-term passive income focus, slightly aggressive. Which 2–3 of these picks are most worth considering adding? Keep it to 3 short paragraphs, direct, no disclaimers.`;
-
-  await callILMU(prompt,resp);
-}
-
-// ─── ILMU API ─────────────────────────────────────────────────────────────────
-function buildPortfolioSnapshot(){
+// ─── ILMU via n8n proxy ───────────────────────────────────────────────────────
+function buildSnapshot(){
   return[
-    ...STOCKS.map(s=>{
-      const pd=stkPx[s.ticker]||{},dd=dData[s.ticker]||{};
-      const pnl=pd.price&&s.cost?((pd.price-s.cost)/s.cost*100).toFixed(1)+'%':'N/A';
-      return`${s.ticker}: ${pd.price?fmt(pd.price):'N/A'}, cost $${s.cost}, P&L ${pnl}, Danelfin ${dd.aiscore??'pending'}/10, signal: ${s2sig(dd.aiscore??null)}`;
-    }),
-    ...CRYPTO.map(c=>{
-      const pd=cryPx[c.id]||{};
-      return`${c.ticker}: ${pd.price?fmt(pd.price):'N/A'}, 24h ${(pd.change24h||0).toFixed(1)}%, signal: ${cSig(pd.change24h||0,pd.change7d||0)}`;
-    })
+    ...STOCKS.map(s=>{const pd=stkPx[s.ticker]||{},dd=dData[s.ticker]||{};const pnl=pd.price&&s.cost?((pd.price-s.cost)/s.cost*100).toFixed(1)+'%':'N/A';return`${s.ticker}: ${pd.price?fmt(pd.price):'N/A'}, cost $${s.cost}, P&L ${pnl}, Danelfin ${dd.aiscore??'pending'}/10, signal: ${s2sig(dd.aiscore??null)}`;}),
+    ...CRYPTO.map(c=>{const pd=cryPx[c.id]||{};return`${c.ticker}: ${pd.price?fmt(pd.price):'N/A'}, 24h ${(pd.change24h||0).toFixed(1)}%, signal: ${cSig(pd.change24h||0,pd.change7d||0)}`;})
   ].join('\n');
 }
 
-async function callILMU(userMessage, respEl){
-  const system=`You are a Wall Street analyst briefing Bradley Tan, Senior Brand Executive in Kuala Lumpur. He invests RM500/month in US stocks, ETFs, and crypto. Goal: long-term passive income, slightly aggressive. Uses Danelfin AI scores (≥7=buy, ≤3=avoid). Be direct, specific, max 3 paragraphs, no disclaimers.`;
+async function callILMU(message, respEl){
   try{
-    const r=await fetch(ILMU_URL,{
+    const r=await fetch(N8N_ILMU,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${ILMU_KEY}`},
-      body:JSON.stringify({
-        model:ILMU_MODEL,
-        messages:[
-          {role:'system',content:system},
-          {role:'user',content:userMessage}
-        ],
-        max_tokens:600,
-        temperature:0.7
-      })
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message, context: buildSnapshot()})
     });
-    if(!r.ok){
-      const err=await r.text();
-      throw new Error(`ILMU ${r.status}: ${err}`);
-    }
+    if(!r.ok)throw new Error(`n8n returned ${r.status}`);
     const data=await r.json();
-    const txt=data.choices?.[0]?.message?.content||data.content?.[0]?.text||'No response from ILMU.';
+    const txt=data.choices?.[0]?.message?.content||data.content?.[0]?.text||JSON.stringify(data);
     respEl.className='ai-resp visible';
-    respEl.innerHTML=`<div class="ilmu-badge" style="margin-bottom:6px;">ILMU Claw Nemo-Super</div><br>`+txt.replace(/\n\n/g,'<br><br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    respEl.innerHTML=`<div class="ilmu-badge" style="margin-bottom:8px;">ILMU Claw Nemo-Super</div><br>`+txt.replace(/\n\n/g,'<br><br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
   }catch(e){
-    console.error('ILMU error:',e);
     respEl.className='ai-resp visible';
-    respEl.innerHTML=`<span style="color:var(--watch);">ILMU unavailable: ${e.message}</span>`;
+    respEl.innerHTML=`<span style="color:var(--watch);">ILMU error: ${e.message}</span>`;
+    console.error('ILMU proxy error:',e);
   }
 }
 
@@ -580,9 +488,7 @@ async function askILMU(){
   btn.disabled=true;btn.textContent='Thinking…';
   resp.className='ai-resp visible';
   resp.innerHTML='<span class="spinner"></span> ILMU is thinking…';
-  const snapshot=buildPortfolioSnapshot();
-  const fullMsg=`My portfolio tonight:\n${snapshot}\n\nQuestion: ${q}`;
-  await callILMU(fullMsg,resp);
+  await callILMU(q, resp);
   btn.disabled=false;btn.textContent='Ask ↗';inp.value='';
 }
 
@@ -591,11 +497,7 @@ async function fetchStocks(){
   setS('stocks','warn','Stocks: fetching…');
   let ok=0;
   await Promise.allSettled(STOCKS.map(async s=>{
-    try{
-      const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${s.ticker}&token=${FINNHUB_KEY}`);
-      const d=await r.json();
-      if(d.c>0){stkPx[s.ticker]={price:d.c,change:d.dp||0};ok++;}
-    }catch(e){console.warn('Finnhub:',s.ticker,e.message);}
+    try{const r=await fetch(`https://finnhub.io/api/v1/quote?symbol=${s.ticker}&token=${FINNHUB_KEY}`);const d=await r.json();if(d.c>0){stkPx[s.ticker]={price:d.c,change:d.dp||0};ok++;}}catch(e){console.warn('Finnhub:',s.ticker);}
   }));
   if(ok===STOCKS.length)setS('stocks','live','Stocks: live (Finnhub)');
   else if(ok>0)setS('stocks','warn',`Stocks: ${ok}/${STOCKS.length} loaded`);
@@ -618,72 +520,36 @@ async function fetchCrypto(){
   }
 }
 
-// ─── DANELFIN ─────────────────────────────────────────────────────────────────
-async function fetchDanelfin(){
-  setS('dan','warn','Danelfin: fetching…');
-  const today=new Date().toISOString().split('T')[0];
-  let ok=0;
-  await Promise.allSettled(STOCKS.map(async s=>{
-    try{
-      const r=await fetch(`https://apirest.danelfin.com/ranking?ticker=${s.ticker}&date=${today}`,{headers:{'x-api-key':DANELFIN_KEY}});
-      if(!r.ok)throw new Error(r.status);
-      const data=await r.json();
-      const row=Array.isArray(data)?data[0]:data;
-      if(row&&(row.aiscore||row.ai_score)){
-        dData[s.ticker]={aiscore:row.aiscore??row.ai_score??null,technical:row.technical??null,fundamental:row.fundamental??null,sentiment:row.sentiment??null};
-        ok++;
-      }
-    }catch(e){console.warn('Danelfin:',s.ticker,e.message);}
-  }));
-  if(ok>0)setS('dan','live',`Danelfin: ${ok}/${STOCKS.length} scores loaded`);
-  else setS('dan','warn','Danelfin: pending (update after US close)');
-}
+// ─── STATUS / HEADER / TABS ───────────────────────────────────────────────────
+function setS(key,state,txt){const dm={stocks:'dStocks',crypto:'dCrypto',dan:'dDan'},tm={stocks:'tStocks',crypto:'tCrypto',dan:'tDan'};document.getElementById(dm[key]).className='s-dot '+state;document.getElementById(tm[key]).textContent=txt;}
 
-// ─── STATUS ───────────────────────────────────────────────────────────────────
-function setS(key,state,txt){
-  const dm={stocks:'dStocks',crypto:'dCrypto',dan:'dDan'};
-  const tm={stocks:'tStocks',crypto:'tCrypto',dan:'tDan'};
-  document.getElementById(dm[key]).className='s-dot '+state;
-  document.getElementById(tm[key]).textContent=txt;
-}
-
-// ─── HEADER ───────────────────────────────────────────────────────────────────
 function updateHeader(){
   const now=new Date();
   document.getElementById('dateLbl').textContent=now.toLocaleDateString('en-MY',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  const um=now.getUTCHours()*60+now.getUTCMinutes(),d=now.getUTCDay();
-  const open=d>=1&&d<=5&&um>=13*60+30&&um<20*60;
+  const um=now.getUTCHours()*60+now.getUTCMinutes(),d=now.getUTCDay(),open=d>=1&&d<=5&&um>=13*60+30&&um<20*60;
   document.getElementById('mDot').className='dot'+(open?' open':'');
   const t=document.getElementById('mTxt');t.textContent=open?'US Open':'US Closed';t.style.color=open?'var(--accent)':'var(--muted)';
 }
 
-// ─── TABS ─────────────────────────────────────────────────────────────────────
 function switchTab(n){
-  ['signals','allocation','analyst'].forEach((name,i)=>{
-    document.querySelectorAll('.tab')[i].classList.toggle('active',name===n);
-    document.getElementById('panel-'+name).classList.toggle('active',name===n);
-  });
+  ['signals','allocation','analyst'].forEach((name,i)=>{document.querySelectorAll('.tab')[i].classList.toggle('active',name===n);document.getElementById('panel-'+name).classList.toggle('active',name===n);});
   if(n==='allocation')renderAlloc();
-  if(n==='analyst'){renderBriefing();}
+  if(n==='analyst')renderBriefing();
 }
 
-// ─── REFRESH ──────────────────────────────────────────────────────────────────
 async function refreshAll(){
   document.getElementById('lastUp').textContent='Refreshing…';
   await Promise.all([fetchStocks(),fetchCrypto(),fetchDanelfin()]);
   renderStocks();renderCrypto();
-  const now=new Date();
-  document.getElementById('lastUp').textContent='Updated '+now.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('lastUp').textContent='Updated '+new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
 (async()=>{
   updateHeader();setInterval(updateHeader,60000);
   document.getElementById('lastUp').textContent='Loading…';
   await Promise.all([fetchStocks(),fetchCrypto(),fetchDanelfin()]);
   renderStocks();renderCrypto();
-  const now=new Date();
-  document.getElementById('lastUp').textContent='Updated '+now.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('lastUp').textContent='Updated '+new Date().toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'});
   document.getElementById('qIn').addEventListener('keydown',e=>{if(e.key==='Enter')askILMU();});
 })();
 </script>
