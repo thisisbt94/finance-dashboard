@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal — Bradley's Nightly Briefing</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0f;--surface:#111118;--surface2:#18181f;
+    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+    --text:#f0f0f0;--muted:#6b6b7a;
+    --accent:#c8f25a;
+    --buy:#c8f25a;--buy-dim:rgba(200,242,90,0.1);
+    --hold:#f0c040;--hold-dim:rgba(240,192,64,0.1);
+    --watch:#ff6b6b;--watch-dim:rgba(255,107,107,0.1);
+    --blue:#7eb8f7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+
+  header{padding:1.75rem 2.5rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;}
+  .wordmark{font-size:10px;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:3px;}
+  .title{font-family:'Instrument Serif',serif;font-size:26px;font-style:italic;line-height:1;}
+  .title span{color:var(--accent);}
+  .hdr-right{display:flex;align-items:center;gap:12px;}
+  .date-lbl{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+  .market-pill{font-size:10px;padding:3px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;gap:6px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
+  .dot.open{background:var(--accent);animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+  /* STATUS BAR */
+  #statusBar{display:flex;align-items:center;gap:16px;padding:0.55rem 2.5rem;border-bottom:1px solid var(--border);background:var(--surface);font-size:11px;flex-wrap:wrap;}
+  .status-item{display:flex;align-items:center;gap:6px;color:var(--muted);}
+  .status-dot{width:5px;height:5px;border-radius:50%;background:var(--muted);flex-shrink:0;}
+  .status-dot.live{background:var(--buy);}
+  .status-dot.warn{background:var(--hold);}
+  .status-dot.err{background:var(--watch);}
+  #lastUp{margin-left:auto;font-family:'DM Mono',monospace;color:var(--muted);}
+  .ref-btn{font-size:11px;color:var(--muted);background:transparent;border:1px solid var(--border2);border-radius:6px;padding:3px 10px;cursor:pointer;transition:all 0.15s;}
+  .ref-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.2);}
+
+  .tabs{display:flex;border-bottom:1px solid var(--border);padding:0 2.5rem;}
+  .tab{padding:0.7rem 1.2rem;font-size:11px;letter-spacing:0.08em;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s;text-transform:uppercase;}
+  .tab:hover{color:var(--text);}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+  main{padding:1.75rem 2.5rem;max-width:1200px;}
+  .panel{display:none;}.panel.active{display:block;}
+  .sec-lbl{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.9rem;}
+
+  /* GRID */
+  .sig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:2rem;}
+  .sig-card{background:var(--surface);padding:1.1rem;cursor:pointer;transition:background 0.1s;position:relative;}
+  .sig-card:hover{background:var(--surface2);}
+  .sig-card.selected{background:var(--surface2);outline:1px solid var(--accent);outline-offset:-1px;}
+  .sig-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+  .sig-card.buy::before{background:var(--buy);}
+  .sig-card.hold::before{background:var(--hold);}
+  .sig-card.watch::before{background:var(--watch);}
+
+  .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;}
+  .tkr-blk{display:flex;flex-direction:column;gap:1px;}
+  .tkr{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;}
+  .tkr-name{font-size:10px;color:var(--muted);}
+  .sig-pill{font-size:9px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:20px;}
+  .sig-pill.buy{background:var(--buy-dim);color:var(--buy);}
+  .sig-pill.hold{background:var(--hold-dim);color:var(--hold);}
+  .sig-pill.watch{background:var(--watch-dim);color:var(--watch);}
+
+  .card-price{display:flex;align-items:baseline;gap:8px;margin-bottom:0.6rem;}
+  .price{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;}
+  .chg{font-family:'DM Mono',monospace;font-size:11px;}
+  .up{color:var(--buy);}.down{color:var(--watch);}
+
+  .score-row{display:flex;align-items:center;gap:10px;margin-bottom:0.6rem;}
+  .ring-wrap{position:relative;width:36px;height:36px;flex-shrink:0;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;}
+  .subscores{flex:1;display:flex;flex-direction:column;gap:3px;}
+  .ssrow{display:flex;align-items:center;gap:6px;}
+  .sslbl{font-size:9px;color:var(--muted);width:28px;}
+  .ssbar{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;}
+  .ssfill{height:100%;border-radius:2px;}
+  .ssval{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);width:12px;text-align:right;}
+  .card-reason{font-size:10px;color:var(--muted);line-height:1.5;}
+
+  /* DETAIL */
+  .detail-panel{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:1.5rem;margin-bottom:2rem;display:none;}
+  .detail-panel.visible{display:block;}
+  .d-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;}
+  .d-tkr{font-family:'Instrument Serif',serif;font-size:30px;font-style:italic;}
+  .d-nm{font-size:12px;color:var(--muted);margin-top:2px;}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:1.25rem;}
+  .stat-cell{background:var(--surface2);padding:0.7rem 0.9rem;}
+  .stat-lbl{font-size:9px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px;}
+  .stat-val{font-family:'DM Mono',monospace;font-size:14px;}
+  .action-box{border-radius:8px;padding:0.9rem 1.1rem;display:flex;align-items:flex-start;gap:10px;border:1px solid;}
+  .action-box.buy{background:var(--buy-dim);border-color:rgba(200,242,90,0.2);}
+  .action-box.hold{background:var(--hold-dim);border-color:rgba(240,192,64,0.2);}
+  .action-box.watch{background:var(--watch-dim);border-color:rgba(255,107,107,0.2);}
+  .action-icon{font-size:18px;flex-shrink:0;}
+  .action-txt{font-size:12px;line-height:1.6;}
+  .action-txt strong{font-weight:500;display:block;margin-bottom:2px;font-size:13px;}
+
+  /* ALLOCATION */
+  .budget-card{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;}
+  .budget-amt{font-family:'Instrument Serif',serif;font-size:40px;font-style:italic;}
+  .alloc-row{display:flex;align-items:center;gap:12px;padding:0.65rem 0;border-bottom:1px solid var(--border);}
+  .alloc-row:last-child{border-bottom:none;}
+  .a-tkr{font-family:'DM Mono',monospace;font-size:12px;width:65px;flex-shrink:0;}
+  .a-score{font-family:'DM Mono',monospace;font-size:11px;width:20px;flex-shrink:0;text-align:center;}
+  .a-bar-wrap{flex:1;height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;}
+  .a-bar{height:100%;border-radius:3px;}
+  .a-amt{font-family:'DM Mono',monospace;font-size:12px;width:58px;text-align:right;flex-shrink:0;}
+  .a-sig{font-size:9px;width:36px;text-align:right;text-transform:uppercase;flex-shrink:0;}
+
+  /* BRIEFING */
+  .b-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1.25rem;}
+  .b-lbl{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;}
+  .b-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+  .b-content{font-size:13px;color:#b0b0bf;line-height:1.85;}
+  .b-content .hl{color:var(--text);font-weight:500;}
+  .b-content .buy-hl{color:var(--buy);}
+  .b-content .watch-hl{color:var(--watch);}
+
+  .q-box{display:flex;gap:8px;margin-top:0.9rem;}
+  .q-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:0.65rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;}
+  .q-input:focus{border-color:var(--accent);}
+  .q-input::placeholder{color:var(--muted);}
+  .q-btn{background:var(--accent);color:#0a0a0f;border:none;border-radius:8px;padding:0.65rem 1.1rem;font-size:13px;font-weight:500;cursor:pointer;}
+  .q-btn:hover{opacity:0.85;}
+  .q-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .ai-resp{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.25rem;margin-top:1rem;font-size:13px;line-height:1.8;color:#c0c0cf;display:none;}
+  .ai-resp.visible{display:block;}
+
+  .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(200,242,90,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:-2px;margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  footer{padding:1.25rem 2.5rem;border-top:1px solid var(--border);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="wordmark">YTLCC · Personal Finance</div>
+    <div class="title">Signal <span>//</span> Nightly Briefing</div>
+  </div>
+  <div class="hdr-right">
+    <div class="date-lbl" id="dateLbl"></div>
+    <div class="market-pill"><div class="dot" id="mDot"></div><span id="mTxt" style="font-family:'DM Mono',monospace;font-size:10px;"></span></div>
+  </div>
+</header>
+
+<!-- STATUS BAR -->
+<div id="statusBar">
+  <div class="status-item"><div class="status-dot" id="sDotStocks"></div><span id="sTxtStocks">Stocks: loading…</span></div>
+  <div class="status-item"><div class="status-dot" id="sDotCrypto"></div><span id="sTxtCrypto">Crypto: loading…</span></div>
+  <div class="status-item"><div class="status-dot" id="sDotDan"></div><span id="sTxtDan">Danelfin: loading…</span></div>
+  <span id="lastUp"></span>
+  <button class="ref-btn" onclick="refreshAll()">↻ Refresh all</button>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('signals')">Signals</div>
+  <div class="tab" onclick="switchTab('allocation')">RM500 Plan</div>
+  <div class="tab" onclick="switchTab('briefing')">AI Briefing</div>
+</div>
+
+<main>
+  <!-- SIGNALS -->
+  <div class="panel active" id="panel-signals">
+    <div class="sec-lbl" style="font-size:9px;opacity:0.5;margin-bottom:0.4rem;">STOCKS & ETFS — Finnhub live + Danelfin AI score</div>
+    <div class="sig-grid" id="stockGrid"></div>
+    <div class="sec-lbl" style="font-size:9px;opacity:0.5;margin-top:1.5rem;margin-bottom:0.4rem;">CRYPTO — CoinGecko live · momentum signal</div>
+    <div class="sig-grid" id="cryptoGrid"></div>
+    <div class="detail-panel" id="detailPanel"></div>
+  </div>
+
+  <!-- ALLOCATION -->
+  <div class="panel" id="panel-allocation">
+    <div class="budget-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.25rem;">
+        <div><div class="budget-amt">RM 500</div><div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace;">Monthly budget · AI Score weighted</div></div>
+        <div style="font-size:11px;color:var(--muted);text-align:right;max-width:180px;line-height:1.6;">Execute via your broker app — not here.</div>
+      </div>
+      <div class="sec-lbl">Top picks this month</div>
+      <div id="allocList"></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.7;">⚠ Crypto allocation is momentum-weighted. Stocks weighted by Danelfin AI Score (1–10).</div>
+  </div>
+
+  <!-- BRIEFING -->
+  <div class="panel" id="panel-briefing">
+    <div class="b-box"><div class="b-lbl">Tonight's read</div><div class="b-content" id="bContent">Loading scores…</div></div>
+    <div class="b-box">
+      <div class="b-lbl">Ask your analyst</div>
+      <div class="q-box">
+        <input type="text" class="q-input" id="qIn" placeholder="e.g. Which of my stocks has the best Danelfin score? Should I buy more NVDA?" />
+        <button class="q-btn" id="qBtn" onclick="askAI()">Ask ↗</button>
+      </div>
+      <div class="ai-resp" id="aiResp"></div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span style="font-style:italic;">Personal use only — not financial advice. Scores update after US market close (~4am MYT).</span>
+  <span style="font-family:'DM Mono',monospace;font-size:10px;">Bradley Tan · YTLCC</span>
+</footer>
+
+<script>
+// ─── API KEYS (hardcoded) ─────────────────────────────────────────────────────
+const FINNHUB_KEY  = 'd7a9ms9r01qn9i7k5fjgd7a9ms9r01qn9i7k5fk0';
+const DANELFIN_KEY = 'P2EuYEzr4w3u83XAX9UdlasSdEZWXGmU3Ugbg8tG';
+// CoinMarketCap is server-side only (CORS blocked) — using CoinGecko for crypto instead
+
+// ─── HOLDINGS ────────────────────────────────────────────────────────────────
+const STOCKS = [
+  {ticker:'NVDA', name:'Nvidia',       cost:186.07, qty:0.4028},
+  {ticker:'PLTR', name:'Palantir',     cost:146.66, qty:0.1704},
+  {ticker:'TSLA', name:'Tesla',        cost:392.54, qty:0.1273},
+  {ticker:'AMD',  name:'AMD',          cost:253.91, qty:0.12  },
+  {ticker:'MRVL', name:'Marvell Tech', cost:138.94, qty:0.15  },
+  {ticker:'MSTR', name:'Strategy',     cost:170.54, qty:0.1758},
+  {ticker:'AAPL', name:'Apple',        cost:277.40, qty:0.1261},
+  {ticker:'INTC', name:'Intel',        cost:77.12,  qty:0.6372},
+  {ticker:'TSM',  name:'TSMC',         cost:389.84, qty:0.0256},
+  {ticker:'QQQ',  name:'Nasdaq 100',   cost:615.87, qty:0.4149},
+  {ticker:'VOO',  name:'S&P 500 ETF',  cost:630.55, qty:0.1424},
+  {ticker:'SOXX', name:'Semi ETF',     cost:374.64, qty:0.2401},
+  {ticker:'VUG',  name:'Growth ETF',   cost:80.55,  qty:0.4962},
+];
+const CRYPTO = [
+  {ticker:'BTC',  name:'Bitcoin',      id:'bitcoin'           },
+  {ticker:'ETH',  name:'Ethereum',     id:'ethereum'          },
+  {ticker:'SOL',  name:'Solana',       id:'solana'            },
+  {ticker:'XRP',  name:'XRP',          id:'ripple'            },
+  {ticker:'ONDO', name:'Ondo Finance', id:'ondo-finance'      },
+  {ticker:'ADA',  name:'Cardano',      id:'cardano'           },
+  {ticker:'HBAR', name:'Hedera',       id:'hedera-hashgraph'  },
+  {ticker:'MATIC',name:'Polygon',      id:'matic-network'     },
+  {ticker:'XLM',  name:'Stellar',      id:'stellar'           },
+  {ticker:'ZEC',  name:'Zcash',        id:'zcash'             },
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let stkPx={}, cryPx={}, dData={}, selCard=null;
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+const fmt = n => n >= 1000
+  ? '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})
+  : '$' + n.toFixed(n < 1 ? 4 : 2);
+const fmtC = n => (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+const sigColor = {buy:'var(--buy)', hold:'var(--hold)', watch:'var(--watch)'};
+
+function s2sig(score) {
+  if (score == null) return 'hold';
+  if (score >= 7) return 'buy';
+  if (score <= 3) return 'watch';
+  return 'hold';
+}
+function sColor(score) {
+  if (score == null) return 'var(--muted)';
+  if (score >= 7) return 'var(--buy)';
+  if (score <= 3) return 'var(--watch)';
+  return 'var(--hold)';
+}
+function cSig(c24, c7) {
+  if (c24 > 5 && c7 > 10) return 'buy';
+  if (c24 < -5) return 'watch';
+  return 'hold';
+}
+
+// ─── SCORE RING ────────────────────────────────────────────────────────────────
+function ring(score) {
+  const col = sColor(score);
+  const r = 14, ci = 2 * Math.PI * r;
+  const d = score ? (score / 10) * ci : 0;
+  return `<div class="ring-wrap">
+    <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
+      <circle cx="18" cy="18" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3"/>
+      <circle cx="18" cy="18" r="${r}" fill="none" stroke="${col}" stroke-width="3"
+        stroke-dasharray="${d.toFixed(1)} ${ci.toFixed(1)}" stroke-linecap="round"/>
+    </svg>
+    <div class="ring-num" style="color:${col}">${score ?? '—'}</div>
+  </div>`;
+}
+function ssBar(lbl, val, col) {
+  return `<div class="ssrow">
+    <span class="sslbl">${lbl}</span>
+    <div class="ssbar"><div class="ssfill" style="width:${val ? (val/10)*100 : 0}%;background:${col};opacity:0.75;"></div></div>
+    <span class="ssval">${val ?? '—'}</span>
+  </div>`;
+}
+
+// ─── RENDER STOCKS ────────────────────────────────────────────────────────────
+function renderStocks() {
+  const g = document.getElementById('stockGrid'); g.innerHTML = '';
+  STOCKS.forEach(s => {
+    const pd = stkPx[s.ticker] || {};
+    const dd = dData[s.ticker] || {};
+    const price = pd.price, chg = pd.change || 0, score = dd.aiscore ?? null;
+    const sig = s2sig(score);
+    const pnl = price && s.cost ? ((price - s.cost) / s.cost * 100) : null;
+    const reason = score != null
+      ? { buy:`AI Score ${score}/10 — high probability of outperforming market in 3 months.`,
+          hold:`AI Score ${score}/10 — neutral. Hold current position.`,
+          watch:`AI Score ${score}/10 — low outperformance probability. Avoid adding.`}[sig]
+      : (pnl != null ? `${pnl >= 0 ? '+' : ''}${pnl.toFixed(1)}% from cost. Danelfin score pending.` : 'Price loading…');
+
+    const c = document.createElement('div');
+    c.className = `sig-card ${sig}`;
+    c.onclick = () => showDetail({...s, price, chg, pnl, score, dd, sig, type:'stock'}, c);
+    c.innerHTML = `
+      <div class="card-top">
+        <div class="tkr-blk"><span class="tkr">${s.ticker}</span><span class="tkr-name">${s.name}</span></div>
+        <span class="sig-pill ${sig}">${sig.toUpperCase()}</span>
+      </div>
+      <div class="card-price">
+        <span class="price">${price ? fmt(price) : '—'}</span>
+        <span class="chg ${chg >= 0 ? 'up' : 'down'}">${fmtC(chg)}</span>
+      </div>
+      <div class="score-row">
+        ${ring(score)}
+        <div class="subscores">
+          ${ssBar('Tech', dd.technical, 'var(--blue)')}
+          ${ssBar('Fund', dd.fundamental, 'var(--accent)')}
+          ${ssBar('Sent', dd.sentiment, 'var(--hold)')}
+        </div>
+      </div>
+      <div class="card-reason">${reason}</div>`;
+    g.appendChild(c);
+  });
+}
+
+// ─── RENDER CRYPTO ────────────────────────────────────────────────────────────
+function renderCrypto() {
+  const g = document.getElementById('cryptoGrid'); g.innerHTML = '';
+  CRYPTO.forEach(c => {
+    const pd = cryPx[c.id] || {};
+    const price = pd.price, c24 = pd.change24h || 0, c7 = pd.change7d || 0;
+    const sig = cSig(c24, c7);
+    const reason = sig === 'buy'
+      ? `Strong momentum: +${c24.toFixed(1)}% today, +${c7.toFixed(1)}% this week.`
+      : sig === 'watch' ? `Down ${Math.abs(c24).toFixed(1)}% today. Wait for stabilisation.`
+      : `Stable. ${c24 >= 0 ? '+' : ''}${c24.toFixed(1)}% today — hold position.`;
+
+    const el = document.createElement('div');
+    el.className = `sig-card ${sig}`;
+    el.onclick = () => showDetail({...c, price, chg:c24, c7, sig, type:'crypto'}, el);
+    el.innerHTML = `
+      <div class="card-top">
+        <div class="tkr-blk"><span class="tkr">${c.ticker}</span><span class="tkr-name">${c.name}</span></div>
+        <span class="sig-pill ${sig}">${sig.toUpperCase()}</span>
+      </div>
+      <div class="card-price">
+        <span class="price">${price ? fmt(price) : '—'}</span>
+        <span class="chg ${c24 >= 0 ? 'up' : 'down'}">${fmtC(c24)}</span>
+      </div>
+      <div class="score-row" style="gap:8px;align-items:center;">
+        <span style="font-size:11px;color:var(--muted);">7d: <span class="${c7 >= 0 ? 'up' : 'down'}">${fmtC(c7)}</span></span>
+        <span style="font-size:10px;color:var(--muted);">Momentum signal · no AI score</span>
+      </div>
+      <div class="card-reason">${reason}</div>`;
+    g.appendChild(el);
+  });
+}
+
+// ─── DETAIL PANEL ─────────────────────────────────────────────────────────────
+function showDetail(asset, cardEl) {
+  document.querySelectorAll('.sig-card.selected').forEach(c => c.classList.remove('selected'));
+  if (selCard === cardEl) { selCard = null; document.getElementById('detailPanel').classList.remove('visible'); return; }
+  selCard = cardEl; cardEl.classList.add('selected');
+
+  const {sig, price, chg, type, score, dd, pnl, cost, c7} = asset;
+  const col = sColor(score);
+  const msgs = {
+    buy: `<strong>Action: Add position</strong>${score != null ? `Danelfin AI Score ${score}/10 — strong signal. Allocate a portion of your RM500 here this month.` : 'Strong price momentum. Good entry if fundamentals are intact.'}`,
+    hold: `<strong>Action: Hold — no change</strong>Neutral signal. Keep current position, wait for a stronger score before adding.`,
+    watch: `<strong>Action: Do not add</strong>${score != null ? `Danelfin AI Score ${score}/10 — below threshold. Consider trimming if you need to rebalance.` : 'Negative momentum. Wait for recovery before adding.'}`,
+  };
+
+  const dp = document.getElementById('detailPanel');
+  dp.innerHTML = `
+    <div class="d-hdr">
+      <div><div class="d-tkr">${asset.ticker}</div><div class="d-nm">${asset.name || ''} · ${type === 'stock' ? 'Stock / ETF' : 'Crypto'}</div></div>
+      <span class="sig-pill ${sig}" style="font-size:11px;padding:4px 14px;">${sig.toUpperCase()}</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="stat-lbl">Price</div><div class="stat-val">${price ? fmt(price) : '—'}</div></div>
+      <div class="stat-cell"><div class="stat-lbl">24h</div><div class="stat-val ${chg >= 0 ? 'up' : 'down'}">${fmtC(chg)}</div></div>
+      ${type === 'stock'
+        ? `<div class="stat-cell"><div class="stat-lbl">Cost basis</div><div class="stat-val">${fmt(cost)}</div></div>
+           <div class="stat-cell"><div class="stat-lbl">P&L</div><div class="stat-val ${pnl >= 0 ? 'up' : 'down'}">${pnl != null ? pnl.toFixed(1)+'%' : '—'}</div></div>`
+        : `<div class="stat-cell"><div class="stat-lbl">7d change</div><div class="stat-val ${(c7||0) >= 0 ? 'up' : 'down'}">${fmtC(c7||0)}</div></div>
+           <div class="stat-cell"><div class="stat-lbl">AI Score</div><div class="stat-val" style="color:var(--muted)">N/A</div></div>`}
+    </div>
+    ${type === 'stock' && score != null ? `
+    <div class="stat-grid" style="margin-bottom:1.25rem;">
+      <div class="stat-cell"><div class="stat-lbl">AI Score</div><div class="stat-val" style="color:${col}">${score}/10</div></div>
+      <div class="stat-cell"><div class="stat-lbl">Technical</div><div class="stat-val" style="color:var(--blue)">${dd.technical ?? '—'}/10</div></div>
+      <div class="stat-cell"><div class="stat-lbl">Fundamental</div><div class="stat-val" style="color:var(--accent)">${dd.fundamental ?? '—'}/10</div></div>
+      <div class="stat-cell"><div class="stat-lbl">Sentiment</div><div class="stat-val" style="color:var(--hold)">${dd.sentiment ?? '—'}/10</div></div>
+    </div>` : ''}
+    <div class="action-box ${sig}">
+      <div class="action-icon">${sig === 'buy' ? '▲' : sig === 'hold' ? '◆' : '▽'}</div>
+      <div class="action-txt">${msgs[sig]}</div>
+    </div>`;
+  dp.classList.add('visible');
+  dp.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ─── ALLOCATION ───────────────────────────────────────────────────────────────
+function renderAlloc() {
+  const items = [];
+  STOCKS.forEach(s => {
+    const dd = dData[s.ticker] || {};
+    const score = dd.aiscore ?? null;
+    const sig = s2sig(score);
+    const w = score != null ? score : (sig === 'buy' ? 4 : sig === 'hold' ? 2 : 0);
+    if (w > 0) items.push({ticker:s.ticker, score, sig, w, crypto:false});
+  });
+  CRYPTO.forEach(c => {
+    const pd = cryPx[c.id] || {};
+    const sig = cSig(pd.change24h||0, pd.change7d||0);
+    const w = sig === 'buy' ? 3 : sig === 'hold' ? 1 : 0;
+    if (w > 0) items.push({ticker:c.ticker, score:null, sig, w, crypto:true});
+  });
+
+  const tot = items.reduce((a,b) => a + b.w, 0) || 1;
+  const sorted = items.map(i => ({...i, amt:Math.round((i.w/tot)*500)})).sort((a,b)=>b.amt-a.amt).slice(0,12);
+  const max = sorted[0]?.amt || 1;
+  const list = document.getElementById('allocList'); list.innerHTML = '';
+  sorted.forEach(i => {
+    const r = document.createElement('div'); r.className = 'alloc-row';
+    r.innerHTML = `
+      <div class="a-tkr">${i.ticker}${i.crypto ? '<span style="font-size:9px;color:var(--muted);margin-left:3px;">₿</span>' : ''}</div>
+      <div class="a-score" style="color:${i.score ? sColor(i.score) : 'var(--muted)'}">${i.score ?? '~'}</div>
+      <div class="a-bar-wrap"><div class="a-bar" style="width:${Math.round((i.amt/max)*100)}%;background:${sigColor[i.sig]};"></div></div>
+      <div class="a-amt">RM ${i.amt}</div>
+      <div class="a-sig" style="color:${sigColor[i.sig]}">${i.sig}</div>`;
+    list.appendChild(r);
+  });
+}
+
+// ─── BRIEFING ─────────────────────────────────────────────────────────────────
+function renderBriefing() {
+  const buys = [], watches = [], noScore = [];
+  STOCKS.forEach(s => {
+    const dd = dData[s.ticker] || {};
+    if (dd.aiscore == null) { noScore.push(s.ticker); return; }
+    const sig = s2sig(dd.aiscore);
+    if (sig === 'buy')   buys.push(`${s.ticker} (${dd.aiscore}/10)`);
+    if (sig === 'watch') watches.push(`${s.ticker} (${dd.aiscore}/10)`);
+  });
+  const cryptoBuys = CRYPTO.filter(c => {
+    const pd = cryPx[c.id] || {};
+    return cSig(pd.change24h||0, pd.change7d||0) === 'buy';
+  }).map(c => c.ticker);
+
+  document.getElementById('bContent').innerHTML = `
+    <span class="buy-hl">Stock BUY signals</span>: <span class="hl">${buys.join(', ') || 'None tonight'}</span><br>
+    <span class="watch-hl">Stock WATCH signals</span>: <span class="hl">${watches.join(', ') || 'None'}</span><br>
+    <span class="buy-hl">Crypto momentum BUYs</span>: <span class="hl">${cryptoBuys.join(', ') || 'None'}</span>
+    ${noScore.length ? `<br><br><span style="color:var(--muted)">No Danelfin score for: ${noScore.join(', ')} — scores update after US close (~4am MYT).</span>` : ''}
+    <br><br>Check the <strong>RM500 Plan</strong> tab for your exact monthly split.`;
+}
+
+// ─── FINNHUB STOCK PRICES ──────────────────────────────────────────────────────
+async function fetchStocks() {
+  setStatus('stocks', 'warn', 'Stocks: fetching…');
+  let loaded = 0;
+  await Promise.allSettled(STOCKS.map(async s => {
+    try {
+      const r = await fetch(`https://finnhub.io/api/v1/quote?symbol=${s.ticker}&token=${FINNHUB_KEY}`);
+      if (!r.ok) throw new Error(r.status);
+      const d = await r.json();
+      if (d.c && d.c > 0) {
+        stkPx[s.ticker] = { price: d.c, change: d.dp || 0 }; // c=current, dp=% change
+        loaded++;
+      }
+    } catch(e) { console.warn('Finnhub:', s.ticker, e.message); }
+  }));
+  if (loaded === STOCKS.length) setStatus('stocks', 'live', `Stocks: live (Finnhub)`);
+  else if (loaded > 0) setStatus('stocks', 'warn', `Stocks: ${loaded}/${STOCKS.length} loaded`);
+  else setStatus('stocks', 'err', 'Stocks: Finnhub unavailable');
+}
+
+// ─── COINGECKO CRYPTO PRICES ──────────────────────────────────────────────────
+async function fetchCrypto() {
+  setStatus('crypto', 'warn', 'Crypto: fetching…');
+  try {
+    const ids = CRYPTO.map(c => c.id).join(',');
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true&include_7d_change=true`);
+    if (!r.ok) throw new Error('CoinGecko ' + r.status);
+    const data = await r.json();
+    let loaded = 0;
+    CRYPTO.forEach(c => {
+      if (data[c.id]) {
+        cryPx[c.id] = { price:data[c.id].usd, change24h:data[c.id].usd_24h_change||0, change7d:data[c.id].usd_7d_change||0 };
+        loaded++;
+      }
+    });
+    setStatus('crypto', 'live', `Crypto: live (CoinGecko)`);
+  } catch(e) {
+    console.warn('CoinGecko:', e.message);
+    // fallback mocks
+    cryPx = {
+      bitcoin:{price:96400,change24h:1.2,change7d:8.4},
+      ethereum:{price:1840,change24h:0.8,change7d:5.2},
+      solana:{price:148,change24h:2.4,change7d:12.1},
+      ripple:{price:2.18,change24h:-0.5,change7d:3.8},
+      'ondo-finance':{price:0.92,change24h:-2.1,change7d:-4.3},
+      cardano:{price:0.72,change24h:1.1,change7d:6.7},
+      'hedera-hashgraph':{price:0.19,change24h:3.2,change7d:15.6},
+      'matic-network':{price:0.38,change24h:-1.3,change7d:2.1},
+      stellar:{price:0.28,change24h:0.6,change7d:4.5},
+      zcash:{price:36.40,change24h:-0.9,change7d:1.8},
+    };
+    setStatus('crypto', 'warn', 'Crypto: using cached data');
+  }
+}
+
+// ─── DANELFIN SCORES ──────────────────────────────────────────────────────────
+async function fetchDanelfin() {
+  setStatus('dan', 'warn', 'Danelfin: fetching…');
+  const today = new Date().toISOString().split('T')[0];
+  let loaded = 0;
+  await Promise.allSettled(STOCKS.map(async s => {
+    try {
+      const r = await fetch(`https://apirest.danelfin.com/ranking?ticker=${s.ticker}&date=${today}`, {
+        headers: {'x-api-key': DANELFIN_KEY}
+      });
+      if (!r.ok) throw new Error(r.status);
+      const data = await r.json();
+      const row = Array.isArray(data) ? data[0] : data;
+      if (row && (row.aiscore || row.ai_score)) {
+        dData[s.ticker] = {
+          aiscore:     row.aiscore     ?? row.ai_score    ?? null,
+          technical:   row.technical   ?? null,
+          fundamental: row.fundamental ?? null,
+          sentiment:   row.sentiment   ?? null,
+        };
+        loaded++;
+      }
+    } catch(e) { console.warn('Danelfin:', s.ticker, e.message); }
+  }));
+  if (loaded > 0) setStatus('dan', 'live', `Danelfin: ${loaded}/${STOCKS.length} scores loaded`);
+  else setStatus('dan', 'warn', 'Danelfin: scores pending (update after US close)');
+}
+
+// ─── STATUS BAR HELPER ────────────────────────────────────────────────────────
+function setStatus(key, state, txt) {
+  const dotMap = {stocks:'sDotStocks', crypto:'sDotCrypto', dan:'sDotDan'};
+  const txtMap = {stocks:'sTxtStocks', crypto:'sTxtCrypto', dan:'sTxtDan'};
+  const dot = document.getElementById(dotMap[key]);
+  const lbl = document.getElementById(txtMap[key]);
+  dot.className = 'status-dot ' + state;
+  lbl.textContent = txt;
+}
+
+// ─── AI ANALYST ───────────────────────────────────────────────────────────────
+async function askAI() {
+  const inp = document.getElementById('qIn');
+  const btn = document.getElementById('qBtn');
+  const resp = document.getElementById('aiResp');
+  const q = inp.value.trim(); if (!q) return;
+  btn.disabled = true; btn.textContent = 'Thinking…';
+  resp.className = 'ai-resp visible';
+  resp.innerHTML = '<span class="spinner"></span> Analysing your portfolio…';
+
+  const snap = [
+    ...STOCKS.map(s => {
+      const pd = stkPx[s.ticker] || {};
+      const dd = dData[s.ticker] || {};
+      const pnl = pd.price && s.cost ? ((pd.price-s.cost)/s.cost*100).toFixed(1)+'%' : 'N/A';
+      return `${s.ticker}: price ${pd.price ? fmt(pd.price) : 'N/A'}, cost $${s.cost}, P&L ${pnl}, Danelfin AI: ${dd.aiscore ?? 'pending'}/10 (tech:${dd.technical??'—'} fund:${dd.fundamental??'—'} sent:${dd.sentiment??'—'}), signal: ${s2sig(dd.aiscore??null)}`;
+    }),
+    ...CRYPTO.map(c => {
+      const pd = cryPx[c.id] || {};
+      return `${c.ticker}: price ${pd.price ? fmt(pd.price) : 'N/A'}, 24h: ${(pd.change24h||0).toFixed(1)}%, 7d: ${(pd.change7d||0).toFixed(1)}%, signal: ${cSig(pd.change24h||0, pd.change7d||0)}`;
+    })
+  ].join('\n');
+
+  const system = `You are a Wall Street analyst briefing Bradley Tan, a Senior Brand Executive in Kuala Lumpur, Malaysia.
+He invests RM500/month in US stocks, ETFs, and crypto. Goal: long-term passive income with occasional high-reward plays.
+He uses Danelfin AI scores (1-10) as his primary signal. Scores ≥7 = buy, ≤3 = watch/avoid, 4-6 = hold.
+His portfolio tonight:\n${snap}
+Be direct, specific, and actionable. Maximum 3 paragraphs. No disclaimers. Talk like a desk analyst at Goldman — confident, brief, precise.`;
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system,
+        messages: [{role:'user', content:q}]
+      })
+    });
+    const data = await r.json();
+    const txt = data.content?.map(b => b.text||'').join('') || 'No response.';
+    resp.innerHTML = txt.replace(/\n\n/g,'<br><br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  } catch(e) {
+    resp.innerHTML = 'Error connecting. Check your internet connection.';
+  }
+  btn.disabled = false; btn.textContent = 'Ask ↗'; inp.value = '';
+}
+
+// ─── HEADER ───────────────────────────────────────────────────────────────────
+function updateHeader() {
+  const now = new Date();
+  document.getElementById('dateLbl').textContent =
+    now.toLocaleDateString('en-MY', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+  const um = now.getUTCHours()*60+now.getUTCMinutes(), d = now.getUTCDay();
+  const open = d >= 1 && d <= 5 && um >= 13*60+30 && um < 20*60;
+  document.getElementById('mDot').className = 'dot' + (open ? ' open' : '');
+  const t = document.getElementById('mTxt');
+  t.textContent = open ? 'US Open' : 'US Closed';
+  t.style.color = open ? 'var(--accent)' : 'var(--muted)';
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(n) {
+  ['signals','allocation','briefing'].forEach((name, i) => {
+    document.querySelectorAll('.tab')[i].classList.toggle('active', name === n);
+    document.getElementById('panel-'+name).classList.toggle('active', name === n);
+  });
+  if (n === 'allocation') renderAlloc();
+  if (n === 'briefing')   renderBriefing();
+}
+
+// ─── REFRESH ──────────────────────────────────────────────────────────────────
+async function refreshAll() {
+  document.getElementById('lastUp').textContent = 'Refreshing…';
+  await Promise.all([fetchStocks(), fetchCrypto(), fetchDanelfin()]);
+  renderStocks();
+  renderCrypto();
+  const now = new Date();
+  document.getElementById('lastUp').textContent =
+    'Updated ' + now.toLocaleTimeString('en-MY', {hour:'2-digit', minute:'2-digit'});
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+(async () => {
+  updateHeader();
+  setInterval(updateHeader, 60000);
+  document.getElementById('lastUp').textContent = 'Loading…';
+  await Promise.all([fetchStocks(), fetchCrypto(), fetchDanelfin()]);
+  renderStocks();
+  renderCrypto();
+  const now = new Date();
+  document.getElementById('lastUp').textContent =
+    'Updated ' + now.toLocaleTimeString('en-MY', {hour:'2-digit', minute:'2-digit'});
+  document.getElementById('qIn').addEventListener('keydown', e => { if (e.key === 'Enter') askAI(); });
+})();
+</script>
+</body>
+</html>
